@@ -176,15 +176,15 @@ def GetShipList(sourceList):
 
 def FormatShip(shipList):
 	tierLookup = {
-		'"Heavy Warship"': (42000, 125000, 225000, 325000),
-		'"Medium Warship"': (15000, 85000, 185000, 285000),
-		'"Light Warship"': (8500, 45000, 100000, 200000),
-		'"Interceptor"': (4500, 15000, 45000, 90000),
-		'"Fighter"': (1500, 5000, 10000, 16000),
-		'"Drone"': (1500, 5000, 10000, 16000),
-		'"Heavy Freighter"': (15000, 85000, 185000, 285000),
-		'"Light Freighter"': (7000, 25000, 60000, 100000),
-		'"Transport"': (7500, 25000, 60000, 100000)}
+		'"Heavy Warship"': (45000, 180000, 540000, 1080000),
+		'"Medium Warship"': (15000, 42500, 300000, 900000),
+		'"Light Warship"': (8500, 45000, 170000, 510000),
+		'"Interceptor"': (4500, 18000, 45000, 90000),
+		'"Fighter"': (1500, 4500, 14000, 42000),
+		'"Drone"': (1500, 4500, 14000, 42000),
+		'"Heavy Freighter"': (15000, 75000, 300000, 600000),
+		'"Light Freighter"': (7000, 14000, 28000, 84000),
+		'"Transport"': (7500, 23000, 57000, 140000)}
 	formattedList = []
 	
 	for ship in shipList:
