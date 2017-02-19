@@ -96,7 +96,7 @@ def CheckHash(sourceTuple):
 		message = error.strerror + ' ' + error.filename
 		OnFail(message)
 
-def GetShips(filePath):
+def GetData(filePath):
 	try:
 		dataFile = open(filePath, 'rb')
 		
@@ -108,12 +108,15 @@ def GetShips(filePath):
 		
 		shipList = []
 		variantList = []
+		ammoList = []
+		
+		endNode = ('ship ', 'outfit ', 'mission ', 'event ', 'effect ', 'trade ', 'conversation ', 'government ', '"landing message" ', 'galaxy ', 'system ', 'planet ', 'phrase ', 'tip ', '\tdescription', '\t"description"')
+		
 		for i in range(lineCount):
 			currentLine = dataFile.readline()
 			
 			if currentLine.startswith('ship '):
 				if currentLine.count('"') <= 2:
-					pos = dataFile.tell()
 					name = currentLine.partition(' ')[2].strip()
 					cate = ''
 					hitp = 0
@@ -122,8 +125,9 @@ def GetShips(filePath):
 					
 					for j in range(100):
 						walkLine = dataFile.readline()
+						pos = dataFile.tell()
 						
-						if walkLine.startswith('\t"description"') or walkLine.startswith('\tdescription') or walkLine == '':
+						if walkLine.startswith(tuple(endNode)) or walkLine == '':
 							ship = [name, cate, hitp, figt, dron]
 							shipList.append(ship)
 							dataFile.seek(pos)
@@ -146,23 +150,51 @@ def GetShips(filePath):
 						
 				else:
 					variantList.append(currentLine.partition(' ')[2].strip())
+			
+			elif currentLine.startswith('outfit '):
+				name = currentLine.partition(' ')[2].strip()
+				isAmmo = False
+				hasAmmo = False
+				
+				for j in range(100):
+					walkLine = dataFile.readline()
+					pos = dataFile.tell()
+					
+					if walkLine.startswith(tuple(endNode)) or walkLine == '':
+						if isAmmo:
+							if not hasAmmo:
+								ammoList.append(name)
+						
+						dataFile.seek(pos)
+						break
+					
+					elif walkLine.startswith('\t"category"') or walkLine.startswith('\tcategory'):
+						cate = walkLine.partition(' ')[2].strip()
+						
+						if cate == '"Ammunition"' or cate == 'Ammunition':
+							isAmmo = True
+					
+					elif walkLine.startswith('\t"ammo"') or walkLine.startswith('\tammo'):
+						hasAmmo = True
 		
 		dataFile.close()
-		return (shipList, variantList)
+		return shipList, variantList, ammoList
 		
 	except (IOError, OSError) as error:
 		message = error.strerror + ' ' + error.filename
 		OnFail(message)
 
-def GetShipList(sourceList):
+def GetDataList(sourceList):
 	shipList = []
 	variantList = []
 	excludeList = PARAMS.EXCLUDE
+	ammoList = []
 	
 	for filePath in sourceList:
-		shipTuple = GetShips(filePath)
-		shipList += shipTuple[0]
-		variantList += shipTuple[1]
+		dataTuple = GetData(filePath)
+		shipList += dataTuple[0]
+		variantList += dataTuple[1]
+		ammoList += dataTuple[2]
 	
 	shipList = FormatShip(shipList)
 	shipList += FormatVariant(shipList, variantList)
@@ -172,7 +204,7 @@ def GetShipList(sourceList):
 			if entry == ship[0]:
 				shipList.remove(ship)
 	
-	return shipList
+	return (shipList, ammoList)
 
 def FormatShip(shipList):
 	tierLookup = {
@@ -330,7 +362,7 @@ def GetSelectionRange(max, weightList):
 	
 	return selectionList
 
-def WriteCache(sourceList, shipList):
+def WriteCache(sourceList, shipList, ammoList):
 	try:
 		cacheFile = open('cache', 'wb')
 		
@@ -342,6 +374,9 @@ def WriteCache(sourceList, shipList):
 				'<>' + str(ship[3]) + '<>' + str(ship[4]) + '\n')
 			
 			cacheFile.write(formatShip)
+		
+		for ammo in ammoList:
+			cacheFile.write('^' + ammo + '\n')
 		
 		cacheFile.close()
 		
@@ -355,6 +390,7 @@ def ReadCache():
 		
 		sourceList = []
 		shipList = []
+		ammoList = []
 		for line in cacheFile:
 			if line.startswith('$'):
 				lineTuple = line.strip('$').split('<>')
@@ -367,10 +403,13 @@ def ReadCache():
 					int(lineTuple[3]), int(lineTuple[4].strip())]
 				
 				shipList.append(ship)
+			
+			elif line.startswith('^'):
+				ammoList.append(line.strip('^').strip())
 		
 		cacheFile.close()
 		
-		return (sourceList, shipList)
+		return (sourceList, shipList, ammoList)
 	
 	except (IOError, OSError) as error:
 		message = error.strerror + ' ' + error.filename
@@ -605,6 +644,21 @@ def WriteEvent():
 		message = error.strerror + ' ' + error.filename
 		OnFail(message)
 
+def WriteOutfitter(ammoList):
+	try:
+		salesFile = open('data/sales.txt', 'wb')
+		
+		salesFile.write('outfitter "Gauntlet Ammo"\n')
+		
+		for ammo in ammoList:
+			salesFile.write('\t' + ammo + '\n')
+		
+		salesFile.close()
+	
+	except (IOError, OSError) as error:
+		message = error.strerror + ' ' + error.filename
+		OnFail(message)
+
 def WriteBackup(savePath):
 	try:
 		homePath = os.path.normpath(os.getcwd())
@@ -670,24 +724,31 @@ def main():
 	
 	sourceList = GetSources(gamePath, pluginPath)
 	shipList = []
+	ammoList = []
 	
 	if os.path.isfile('cache'):
 		cacheTuple = ReadCache()
 		
 		if CheckCache(sourceList, cacheTuple[0]):
 			shipList = cacheTuple[1]
+			ammoList = cacheTuple[2]
 		
 		else:
-			shipList = GetShipList(sourceList)
-			WriteCache(sourceList, shipList)
+			dataTuple = GetDataList(sourceList)
+			shipList = dataTuple[0]
+			ammoList = dataTuple[1]
+			WriteCache(sourceList, shipList, ammoList)
 	
 	else:
-		shipList = GetShipList(sourceList)
-		WriteCache(sourceList, shipList)
+		dataTuple = GetDataList(sourceList)
+		shipList = dataTuple[0]
+		ammoList = dataTuple[1]
+		WriteCache(sourceList, shipList, ammoList)
 	
 	WriteMap()
 	WriteMission(shipList)
 	WriteEvent()
+	WriteOutfitter(ammoList)
 	
 	return 0
 
