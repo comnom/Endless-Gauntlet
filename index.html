@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en-US">
+	<head>
+		<meta charset="utf-8">
+		<title>Endless Gauntlet</title>
+		<link rel="stylesheet" type="text/css" href="stylesheets/styles.css">
+		<link rel="shortcut icon" href="images/favicon.png" />
+		<meta name="viewport" content="width=device-width">
+		<!--[if lt IE 9]>
+		<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+		<![endif]-->
+		<script src="javascripts/main.js"></script>
+	</head>
+	<body onload="apiGetLatest()">
+		<div class="wrapper">
+			<header>
+				<h1>Endless Gauntlet</h1>
+				<p>A plugin for <a href="https://endless-sky.github.io/">Endless Sky</a></p>	
+				<ul>
+					<li><a id="endless-gauntlet-zip" href="https://github.com/comnom/Endless-Gauntlet/releases/latest">Download <strong>zip</strong></a></li>
+					<li><a id="endless-gauntlet-tar" href="https://github.com/comnom/Endless-Gauntlet/releases/latest">Download <strong>tar</strong></a></li>
+					<li><a href="https://github.com/comnom/Endless-Gauntlet/">View On <strong>GitHub</strong></a></li>
+				</ul>
+				<h4>Current Version</h4>
+				<p id="current-version"></p>
+				<h4>Install Instructions</h4>
+				<p>Extract to your plugins folder:<br>Linux: ~/.local/share/endless-sky/<br>Windows: %AppData%\endless-sky\<br>Mac OS X: ~/Library/ApplicationSupport/endless-sky/</p>
+			</header>
+			<section>
+				<h2>About</h2>
+				<img alt="Planet" src="images/digitalplanet.png" title="Gauntlet Checkpoint"/>
+				<p>This plugin contains a python script to generate an arcade-style gauntlet wherein you take a mission, jump through a wormhole, and face a series of randomly generated fleets. Intended for end-game players who are comfortable running a python script and toggling some options related to how the gauntlet gets built.</p>
+				<p>Bugs/Compatibility issues can be reported using Github's <a href="https://github.com/comnom/Endless-Gauntlet/issues">issue tracker</a>. Feature requests are also encouraged.</p>
+				<div class="content">
+					<h2>How To Use</h2>
+					<h4>1. Python</h4>
+					<p>Windows users will need to install <a href="https://www.python.org/downloads/">Python</a>. Linux and OSX users should have it installed already.</p>
+					<h4>2. Add your Endless Sky path</h4>
+					<p>Open PARAMS.py in a proper text editor and add the path to your Endless Sky install using forward slashes. Example:</p>
+					<p><code><var>GAME_PATH</var> = 'C:/Program Files (x86)/Steam/steamapps/common/Endless Sky'</code><p>
+					<h4>3. Using plugins</h4>
+					<p>If you'd like to include any ships from plugins you have installed, set USE PLUGINS to 1 and add the path to your plugin directory using forward slashes. Example:</p>
+					<p><code><var>USE_PLUGINS</var> = 1</code><br><code><var>PLUGIN_PATH</var> = 'C:/Users/MyUserName/AppData/Roaming/endless-sky/plugins'</code></p>
+					<h4>4. Automatic save back up</h4>
+					<p>If you'd like the script to back up your save directory when run, set BACKUP SAVES to 1 and add the path to your save directory using forward slashes. Example:</p>
+					<p><code><var>BACKUP_SAVES</var> = 1</code><br><code><var>SAVES_PATH</var> = 'C:/Users/MyUserName/AppData/Roaming/endless-sky/saves'</code></p>
+					<h4>5. All the rest</h4>
+					<p>There are also several settings related to how challenging the resulting gauntlet will be. Everything in PARAMS.py is heavily commented with examples, so feel free to toggle the various setting to get the desired difficulty.</p>
+					<div class="changelog-back" onclick="toggleChangelog()">
+						<p>View Changelog</p>
+						<img id="changelog-arrow" src="images/arrow.svg"/>
+						<pre id="changelog"></pre>
+					</div>
+				</div>
+			</section>
+			<footer>
+				<p>This project is maintained by <a href="https://github.com/comnom">comnom</a></p>
+			</footer>
+		</div>
+		<noscript>
+			<div class="jscript-back">
+				<p>Javascript is disabled. This site uses javascript to get updated links.</p>
+			</div>
+		</noscript>
+    </body>
+</html>
