@@ -530,7 +530,8 @@ def WriteMission(shipList):
 		dataString = ('mission "Gauntlet [{}]"\n\tname "Attempt the Gauntlet!"\n'
 			'\tdescription "Travel through the wormhole and destroy all enemies!"\n'
 			'\tsource "Mysterious Moon"\n\ton offer\n\t\tconversation\n'
-			'\t\t\t`The Pug does little to acknowledge your presence except to ask, ''"Will you attempt The Gauntlet?"`\n\t\t\tchoice\n\t\t\t\t`	'
+			'\t\t\t`The Pug does little to acknowledge your presence except to ask, '
+			'"Will you attempt The Gauntlet?"`\n\t\t\tchoice\n\t\t\t\t`	'
 			'"I will."`\n\t\t\t\t\taccept\n\t\t\t\t`	"Not right now."`\n'
 			'\t\t\t\t\tdefer\n')
 		
