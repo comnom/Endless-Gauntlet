@@ -17,7 +17,7 @@ function apiGetLatest() {
 			document.getElementById("changelog").innerHTML = data.body;
 		}
 	};
-	xhttp.open("GET", "https://api.github.com/repos/comnom/Endless-Gauntlet/releases/latest", true);
+	xhttp.open("GET", "https://api.github.com/repos/comnom/Endless-Gauntlet/releases", true);
 	xhttp.setRequestHeader("Accept", "application/vnd.github.v3+json");
 	xhttp.send();
 }
