@@ -608,11 +608,14 @@ def WriteEvent():
 def WriteBackup(savePath):
 	try:
 		homePath = os.path.normpath(os.getcwd())
+		backupPath = os.path.normpath(homePath + '/backup')
+		
+		if not os.path.isdir(backupPath):
+			os.makedirs(backupPath)
 		
 		for dataFile in os.listdir(savePath):
 			sourcePath = os.path.normpath(savePath + '/' + dataFile)
-			destinationPath = os.path.normpath(homePath + '/backup/' + 
-				dataFile)
+			destinationPath = os.path.normpath(backupPath + '/' + dataFile)
 			
 			shutil.copy(sourcePath, destinationPath)
 	
