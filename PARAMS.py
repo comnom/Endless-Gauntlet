@@ -47,9 +47,14 @@ HEALTHPACK_FREQUENCY = 4000
 # ex. FLEET_SIZE = 10, T5 = 5, Heavy Warship = 5
 # the size of the fleet could be 10/(5 + 5) = 1 T5 heavy warship
 FLEET_SIZE = 5.0
+
 # Random variance for FLEET_SIZE
 VARIANCE = 0.0
 
+# Weights used when selecting a ship. A ship's "cost" is WEIGHTS + T_WEIGHTS.
+# A zero weight will exclude all ships that match.
+# ex. {'"Heavy Warship"': 0.0} means no Heavy Warships of any tier will spawn.
+# ex. {5: 0.0} means no "Tier 5" ships of any category will spawn.
 WEIGHTS = {
 '"Heavy Warship"': 3.5, 
 '"Medium Warship"': 2.5, 
@@ -70,7 +75,7 @@ T_WEIGHTS = {
 }
 
 # Ships that won't be used to build the fleets.
-# Ships with no category are excluded by default.
+# Ships with no category or a zero weight are excluded by default.
 EXCLUDE = [
 '"Deep River 0"', 
 '"Deep River 1"', 

@@ -110,7 +110,16 @@ def GetData(filePath):
 		variantList = []
 		ammoList = []
 		
-		endNode = ('ship ', 'outfit ', 'mission ', 'event ', 'effect ', 'trade ', 'conversation ', 'government ', '"landing message" ', 'galaxy ', 'system ', 'planet ', 'phrase ', 'tip ', '\tdescription', '\t"description"')
+		endNode = ('ship ', 'outfit ', 'mission ', 'event ', 'effect ', 'trade ', 
+			'conversation ', 'government ', '"landing message" ', 'galaxy ', 'system ', 
+			'planet ', 'phrase ', 'tip ', '\tdescription ', '\t"description" ')
+		categoryNode = ('\t\t"category" ', '\t\tcategory ', '\t"category" ', 
+			'\tcategory ')
+		shieldsNode = '\t\t"shields" ', '\t\tshields '
+		hullNode = '\t\t"hull" ', '\t\thull '
+		fighterNode = '\t"fighter" ', '\tfighter '
+		droneNode = '\t"drone" ', '\tdrone '
+		ammoNode = '\t"ammo" ', '\tammo '
 		
 		for i in range(lineCount):
 			currentLine = dataFile.readline()
@@ -127,25 +136,25 @@ def GetData(filePath):
 						walkLine = dataFile.readline()
 						pos = dataFile.tell()
 						
-						if walkLine.startswith(tuple(endNode)) or walkLine == '':
+						if walkLine.startswith(endNode) or walkLine == '':
 							ship = [name, cate, hitp, figt, dron]
 							shipList.append(ship)
 							dataFile.seek(pos)
 							break
 							
-						elif walkLine.startswith('\t\t"category"') or walkLine.startswith('\t\tcategory'):
+						elif walkLine.startswith(categoryNode):
 							cate = walkLine.partition(' ')[2].strip()
 							
-						elif walkLine.startswith('\t\t"shields"') or walkLine.startswith('\t\tshields'):
+						elif walkLine.startswith(shieldsNode):
 							hitp += int(walkLine.partition(' ')[2])
 							
-						elif walkLine.startswith('\t\t"hull"') or walkLine.startswith('\t\thull'):
+						elif walkLine.startswith(hullNode):
 							hitp += int(walkLine.partition(' ')[2])
 							
-						elif walkLine.startswith('\t"fighter"') or walkLine.startswith('\tfighter'):
+						elif walkLine.startswith(fighterNode):
 							figt += 1
 							
-						elif walkLine.startswith('\t"drone"') or walkLine.startswith('\tdrone'):
+						elif walkLine.startswith(droneNode):
 							dron += 1
 						
 				else:
@@ -160,7 +169,7 @@ def GetData(filePath):
 					walkLine = dataFile.readline()
 					pos = dataFile.tell()
 					
-					if walkLine.startswith(tuple(endNode)) or walkLine == '':
+					if walkLine.startswith(endNode) or walkLine == '':
 						if isAmmo:
 							if not hasAmmo:
 								ammoList.append(name)
@@ -168,13 +177,13 @@ def GetData(filePath):
 						dataFile.seek(pos)
 						break
 					
-					elif walkLine.startswith('\t"category"') or walkLine.startswith('\tcategory'):
+					elif walkLine.startswith(categoryNode):
 						cate = walkLine.partition(' ')[2].strip()
 						
 						if cate == '"Ammunition"' or cate == 'Ammunition':
 							isAmmo = True
 					
-					elif walkLine.startswith('\t"ammo"') or walkLine.startswith('\tammo'):
+					elif walkLine.startswith(ammoNode):
 						hasAmmo = True
 		
 		dataFile.close()
@@ -187,7 +196,6 @@ def GetData(filePath):
 def GetDataList(sourceList):
 	shipList = []
 	variantList = []
-	excludeList = PARAMS.EXCLUDE
 	ammoList = []
 	
 	for filePath in sourceList:
@@ -198,6 +206,8 @@ def GetDataList(sourceList):
 	
 	shipList = FormatShip(shipList)
 	shipList += FormatVariant(shipList, variantList)
+	
+	excludeList = PARAMS.EXCLUDE
 	
 	for entry in excludeList:
 		for ship in shipList[:]:
@@ -277,14 +287,13 @@ def SplitShipList(shipList):
 	return shipList, fighterList, droneList
 
 def SelectShip(min, max, shipList, weightList):
-	doSelection = 1
-	ship = []
-	
 	if min > max:
 		max = min
 	
 	selectionRange = GetSelectionRange(max, weightList)
 	selection = random.choice(selectionRange)
+	doSelection = 1
+	ship = []
 	
 	while doSelection:
 		ship = random.choice(shipList)
@@ -298,12 +307,29 @@ def SelectShip(min, max, shipList, weightList):
 	return ship
 
 def GetCheckpoints():
+	remainder = PARAMS.GALAXY_SIZE % 10
+	maxRange = PARAMS.GALAXY_SIZE - remainder
+	
+	min = PARAMS.CHECKPOINT_MIN
+	max = PARAMS.CHECKPOINT_MAX
+	
+	if max > 10:
+		max = 10
+	
+	if min > max:
+		min = max - 1
+	
+	checkpoints = PARAMS.CHECKPOINTS
+	
+	if checkpoints > (max - min):
+		checkpoints = (max - min)
+	
 	checkpointList = []
 	
-	if PARAMS.CHECKPOINTS:
-		for i in range(0, PARAMS.GALAXY_SIZE, 10):
-			validRange = range(PARAMS.CHECKPOINT_MIN + i, PARAMS.CHECKPOINT_MAX + i)
-			choice = random.sample(validRange, PARAMS.CHECKPOINTS)
+	if checkpoints:
+		for i in range(0, maxRange, 10):
+			validRange = range(min + i, max + i)
+			choice = random.sample(validRange, checkpoints)
 			checkpointList += choice
 	
 	return sorted(checkpointList)
@@ -345,7 +371,6 @@ def GetMinWeight(weightList):
 	return sorted(minList)[0]
 
 def GetSelectionRange(max, weightList):
-	selectionList = []
 	tmpList = []
 	
 	for i in PARAMS.WEIGHTS:
@@ -355,6 +380,8 @@ def GetSelectionRange(max, weightList):
 			if weightSum <= max:
 				if [i, j] in weightList:
 					tmpList.append([i, j, weightSum])
+	
+	selectionList = []
 	
 	for i in tmpList:
 		for j in range(int(round(i[2]))):
@@ -475,7 +502,8 @@ def DoObjects(index, checkpointList):
 	else:
 		dataString = ('\tobject "The Gauntlet"\n\t\tsprite planet/wormhole\n'
 			'\t\tdistance 540.407\n\t\tperiod 206.769\n')
-		data = ['\tobject\n\t\tsprite star/{}\n\t\tperiod 10\n'.format(star), dataString]
+		data = ['\tobject\n\t\tsprite star/{}\n\t\tperiod 10\n'.format(star), 
+			dataString]
 		
 	return data
 
@@ -533,6 +561,7 @@ def WriteMap():
 		
 		checkpointList = GetCheckpoints()
 		coordinateList = GetCoordinates()
+		frequency = PARAMS.HEALTHPACK_FREQUENCY
 		
 		for i in range(PARAMS.GALAXY_SIZE):
 			asteroids = random.randint(0, 6)
@@ -547,7 +576,7 @@ def WriteMap():
 				for j in DoAsteroids(asteroids):
 					mapFile.write(j)
 			
-			mapFile.write('\tfleet "healthpacks" {}\n'.format(PARAMS.HEALTHPACK_FREQUENCY))
+			mapFile.write('\tfleet "healthpacks" {}\n'.format(frequency))
 			
 			for j in DoObjects(i, checkpointList):
 				mapFile.write(j)
@@ -606,9 +635,9 @@ def WriteMission(shipList):
 		
 		for i in range(PARAMS.GALAXY_SIZE):
 			dataString = ('\tnpc kill\n\t\tsystem "VR System {}"\n'
-			'\t\tpersonality vindictive staying\n\t\tgovernment "Bounty"\n'
-			'\t\tfleet\n\t\t\tnames "pirate"\n\t\t\tfighters "pirate"'
-			'\n\t\t\tvariant\n')
+				'\t\tpersonality vindictive staying\n\t\tgovernment "Bounty"\n'
+				'\t\tfleet\n\t\t\tnames "pirate"\n\t\t\tfighters "pirate"'
+				'\n\t\t\tvariant\n')
 			
 			missionFile.write(dataString.format(str(i)))
 			
@@ -620,8 +649,8 @@ def WriteMission(shipList):
 		missionFile.write('\ton accept\n\t\tevent "gauntlet show"\n')
 		
 		dataString = ('\ton complete\n\t\tevent "gauntlet clear"\n'
-		'\t\tevent "gauntlet hide"\n\t\tpayment 1000000\n'
-		'\t\tdialog "The Pug says nothing this time, but pays you <payment>."\n')
+			'\t\tevent "gauntlet hide"\n\t\tpayment 1000000\n'
+			'\t\tdialog "The Pug says nothing this time, but pays you <payment>."\n')
 		
 		missionFile.write(dataString)
 		
