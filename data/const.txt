@@ -144,3 +144,38 @@ ship "Health Pack" "Health Pack (Multi)"
 			"shield damage" -2000
 			"hull damage" -2000
 			"piercing" .5
+
+government "HealthPacks"
+	swizzle 0
+	color .8 .5 .1
+	
+	"player reputation" -1000
+
+fleet "healthpacks"
+	government "HealthPacks"
+	names "civilian"
+	cargo 0
+	personality
+		confusion 35
+		timid frugal
+	variant 2
+		"Health Pack" 2
+	variant 2
+		"Health Pack (Shields)" 2
+	variant 4
+		"Health Pack"
+		"Health Pack (Shields)"
+	variant 3
+		"Health Pack (Multi)" 2
+	variant 3
+		"Health Pack" 2
+		"Health Pack (Shields)"
+	variant 1
+		"Health Pack (Multi)" 2
+		"Health Pack (Shields)"
+	variant 1
+		"Health Pack (Multi)" 2
+		"Health Pack"
+	variant 1
+		"Health Pack" 2
+		"Health Pack (Shields)" 2

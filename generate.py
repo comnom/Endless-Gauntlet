@@ -547,6 +547,8 @@ def WriteMap():
 				for j in DoAsteroids(asteroids):
 					mapFile.write(j)
 			
+			mapFile.write('\tfleet "healthpacks" {}\n'.format(PARAMS.HEALTHPACK_FREQUENCY))
+			
 			for j in DoObjects(i, checkpointList):
 				mapFile.write(j)
 			

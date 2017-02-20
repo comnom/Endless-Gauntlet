@@ -38,6 +38,9 @@ CHECKPOINTS = 1
 CHECKPOINT_MIN = 3
 CHECKPOINT_MAX = 6
 
+# Frequency of the healthpack ships in milliseconds.
+HEALTHPACK_FREQUENCY = 4000
+
 # Difficulty of the individual fleets using WEIGHTS below.
 # ex. FLEET_SIZE = 10, T1 = .5, Interceptor = .5
 # the size of the fleet could be 10/(.5 + .5) = 10 T1 interceptors
