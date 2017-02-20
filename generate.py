@@ -204,7 +204,7 @@ def GetDataList(sourceList):
 			if entry == ship[0]:
 				shipList.remove(ship)
 	
-	return (shipList, ammoList)
+	return shipList, ammoList
 
 def FormatShip(shipList):
 	tierLookup = {
@@ -274,7 +274,7 @@ def SplitShipList(shipList):
 			droneList.append(ship)
 			shipList.remove(ship)
 	
-	return (shipList, fighterList, droneList)
+	return shipList, fighterList, droneList
 
 def SelectShip(min, max, shipList, weightList):
 	doSelection = 1
@@ -334,7 +334,7 @@ def GetValidWeights(shipList):
 			if weight not in weightList:
 				weightList.append(weight)
 
-	return (shipList, weightList)
+	return shipList, weightList
 
 def GetMinWeight(weightList):
 	minList = []
@@ -409,7 +409,7 @@ def ReadCache():
 		
 		cacheFile.close()
 		
-		return (sourceList, shipList, ammoList)
+		return sourceList, shipList, ammoList
 	
 	except (IOError, OSError) as error:
 		message = error.strerror + ' ' + error.filename

@@ -32,7 +32,6 @@ planet "Mysterious Moon"
 	landscape land/gauntlet
 	description `Something is not quite right about this moon...`
 	spaceport `There is no spaceport! You've landed in complete emptiness, save for an old wizened Pug sitting at a desk.`
-	outfitter "Gauntlet Ammo"
 
 event "gauntlet show"
 	system "Mora"
@@ -98,3 +97,50 @@ event "gauntlet hide"
 				sprite "planet/digitalmoon"
 				distance 402
 				period 24.168
+
+ship "Health Pack"
+	sprite "ship/healthpack"
+	attributes
+		category "Interceptor"
+		"cost" 5
+		"shields" 100
+		"hull" 100
+		"required crew" 1
+		"bunks" 1
+		"mass" 10
+		"drag" 1
+		"heat dissipation" .9
+		"jump drive" 1
+		"jump speed" .3
+		"ramscoop" 2
+		"fuel capacity" 1000
+		"energy generation" .7
+		"energy capacity" 100
+		"turn" 40
+		"turning energy" .2
+		"thrust" 10
+		"thrusting energy" .3
+		weapon
+			"blast radius" 400
+			"hull damage" -1000
+			"piercing" 1
+		
+	engine -18 145
+	explode "small explosion" 25
+	description "A Health Pack."
+	
+ship "Health Pack" "Health Pack (Shields)"
+	sprite "ship/healthpackblue"
+	attributes
+		weapon
+			"blast radius" 400
+			"shield damage" -1000
+	
+ship "Health Pack" "Health Pack (Multi)"
+	sprite "ship/healthpackpurple"
+	attributes
+		weapon
+			"blast radius" 400
+			"shield damage" -2000
+			"hull damage" -2000
+			"piercing" .5
