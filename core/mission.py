@@ -52,11 +52,11 @@ def Mission(allShips):
 	choice = DataNode(tokens=["choice"])
 	conversation.Append(choice)
 	
-	confirm = DataNode(tokens=['"I will"'])
+	confirm = DataNode(tokens=['	"I will"'])
 	choice.Append(confirm)
 	confirm.Append(DataNode(tokens=["accept"]))
 	
-	decline = DataNode(tokens=['"Not right now."'])
+	decline = DataNode(tokens=['	"Not right now."'])
 	choice.Append(decline)
 	decline.Append(DataNode(tokens=["defer"]))
 	
@@ -99,7 +99,6 @@ def Mission(allShips):
 	
 	
 def GetFleet(allShips):
-	print "	Adding fleet..."
 	ships = allShips[0]
 	fighters = allShips[1]
 	drones = allShips[2]
@@ -123,25 +122,21 @@ def GetFleet(allShips):
 		fCount = ship.fighters
 		dCount = ship.drones
 		while round(fleetSize, 1) > round(minFighter, 1) and fCount:
-			print "in fighters", fleetSize, minFighter, dCount
 			fighter = GetShip(fighters, fleetSize)
-			if ship == None:
+			if fighter == None:
 				break
 				
 			fighterName = (fighter.variantName if fighter.variantName else fighter.modelName)
 			fleet.append(fighterName)
-			print fighterName
 			fleetSize -= fighter.cost
 			fCount -= 1
 			
 		while round(fleetSize, 1) > round(minDrone, 1) and dCount:
-			print "in drones", fleetSize, minDrone, dCount
 			drone = GetShip(drones, fleetSize)
 			if drone == None:
 				break
 				
 			droneName = (drone.variantName if drone.variantName else drone.modelName)
-			print droneName
 			fleet.append(droneName)
 			fleetSize -= drone.cost
 			dCount -= 1
