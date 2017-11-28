@@ -101,21 +101,6 @@ class DataNode(object):
 		return False
 		
 	
-	def HasToken(self, token, deep=False):
-		match = False
-		if token in self.tokens:
-			match = True
-			
-		if not match and deep:
-			for node in self.Begin():
-				if match:
-					break
-				
-				match = node.HasToken(token, deep=True)
-				
-		return match
-		
-		
 	def Begin(self):
 		for it in self.children[:]:
 			yield it
