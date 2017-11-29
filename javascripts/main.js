@@ -8,16 +8,16 @@ function apiGetLatest() {
 	xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var data = JSON.parse(this.responseText);
-			document.getElementById("endless-gauntlet-zip").href = 
-			"https://github.com/comnom/Endless-Gauntlet/archive/" + data[0].tag_name + ".zip";
+			document.getElementById("endless-gauntlet-zip").href = data.assets[1].browser_download_url;
 			document.getElementById("endless-gauntlet-tar").href = 
-			"https://github.com/comnom/Endless-Gauntlet/archive/" + data[0].tag_name + ".tar.gz";
+			"https://github.com/comnom/Endless-Gauntlet/archive/" + data.tag_name + ".tar.gz";
 			document.getElementById("current-version").innerHTML = 
-			data[0].tag_name + " Released: " + data[0].published_at.split("T")[0];
-			document.getElementById("changelog").innerHTML = data[0].body;
+			data.tag_name + " Released: " + data.published_at.split("T")[0];
+			document.getElementById("endless-gauntlet-py3").href = data.assets[0].browser_download_url;
+			document.getElementById("changelog").innerHTML = data.body;
 		}
 	};
-	xhttp.open("GET", "https://api.github.com/repos/comnom/Endless-Gauntlet/releases", true);
+	xhttp.open("GET", "https://api.github.com/repos/comnom/Endless-Gauntlet/releases/latest", true);
 	xhttp.setRequestHeader("Accept", "application/vnd.github.v3+json");
 	xhttp.send();
 }
