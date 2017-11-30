@@ -8,12 +8,11 @@ function apiGetLatest() {
 	xhttp.onreadystatechange = function() {
 		if (this.readyState == 4 && this.status == 200) {
 			var data = JSON.parse(this.responseText);
-			document.getElementById("endless-gauntlet-zip").href = data.assets[1].browser_download_url;
+			document.getElementById("endless-gauntlet-zip").href = data.assets[0].browser_download_url;
 			document.getElementById("endless-gauntlet-tar").href = 
 			"https://github.com/comnom/Endless-Gauntlet/archive/" + data.tag_name + ".tar.gz";
 			document.getElementById("current-version").innerHTML = 
 			data.tag_name + " Released: " + data.published_at.split("T")[0];
-			document.getElementById("endless-gauntlet-py3").href = data.assets[0].browser_download_url;
 			document.getElementById("changelog").innerHTML = data.body;
 		}
 	};
