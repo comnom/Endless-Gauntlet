@@ -120,25 +120,23 @@ def GetFleet(allShips):
 		fleetSize -= ship.cost
 		
 		fCount = ship.fighters
-		dCount = ship.drones
-		while round(fleetSize, 1) > round(minFighter, 1) and fCount:
-			fighter = GetShip(fighters, fleetSize)
+		while fCount:
+			fighter = GetCarried(fighters, ship.tier)
 			if fighter == None:
 				break
 				
 			fighterName = (fighter.variantName if fighter.variantName else fighter.modelName)
 			fleet.append(fighterName)
-			fleetSize -= fighter.cost
 			fCount -= 1
 			
-		while round(fleetSize, 1) > round(minDrone, 1) and dCount:
-			drone = GetShip(drones, fleetSize)
+		dCount = ship.drones
+		while dCount:
+			drone = GetCarried(drones, ship.tier)
 			if drone == None:
 				break
 				
 			droneName = (drone.variantName if drone.variantName else drone.modelName)
 			fleet.append(droneName)
-			fleetSize -= drone.cost
 			dCount -= 1
 			
 	return fleet
@@ -154,8 +152,25 @@ def GetShip(ships, fleetSize):
 			if combo not in validWeights:
 				validWeights.append(combo)
 				
+	return Selection(validShips, validWeights)
+	
+	
+def GetCarried(ships, tier):
+	validShips = []
+	validWeights = []
+	for ship in ships.values():
+		if ship.tier <= tier:
+			validShips.append(ship)
+			combo = [ship.tier, ship.category]
+			if combo not in validWeights:
+				validWeights.append(combo)
+				
+	return Selection(validShips, validWeights)
+	
+	
+def Selection(ships, weights):
 	weightedList = []
-	for combo in validWeights:
+	for combo in weights:
 		sum = int(PARAMS.T_WEIGHTS[combo[0]] + PARAMS.WEIGHTS[combo[1]])
 		for i in range(sum):
 			weightedList.append(combo)
@@ -164,11 +179,12 @@ def GetShip(ships, fleetSize):
 	doSelection = 1000
 	while doSelection > 0:
 		doSelection -= 1
-		ship = random.choice(validShips)
+		ship = random.choice(ships)
 		if ship.tier == selection[0] and ship.category == selection[1]:
 			return ship
 			
 	return None
+	
 	
 def GetMin(ships):
 	cost = 0
