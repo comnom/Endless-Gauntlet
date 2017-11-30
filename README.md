@@ -8,8 +8,8 @@ Intended for end-game players who are comfortable running a python script, and t
 * How To Use
   * Windows users need to install [Python](https://www.python.org/downloads/) .
   * OSX and Linux users should have it installed already.
-  * Open PARAMS.py and add the path to your install directory, and optionally your plugin/save directory. This is also where you tweak the difficulty of the gauntlet to your liking.
-  * Run the generate.py script, and the Endless-Gauntlet/data folder will be populated with the necessary files.
+  * Open params.txt and add the path to your Endless Sky/data directory, and optionally your plugin directory. This is also where you tweak the difficulty of the gauntlet to your liking.
+  * Run the generate.py script, and the endless-gauntlet/data folder will be populated with the necessary files.
 
 ## Install
 Unzip to your plugins folder found here:
