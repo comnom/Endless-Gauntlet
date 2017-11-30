@@ -126,3 +126,4 @@ if __name__ == "__main__":
 	salesFile.Save()
 	eventFile.Save()
 	print "Done!"
+	done = raw_input("Press enter to close.")
