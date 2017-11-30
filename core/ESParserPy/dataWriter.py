@@ -30,8 +30,8 @@ import os
 
 class DataWriter(object):
 	def __init__(self, path):
-		self.indent = ""
-		self.space = " "
+		self.indent = b""
+		self.space = b" "
 		self.before = self.indent
 		self.path = os.path.normpath(path)
 		self.out = io.BytesIO()
@@ -60,22 +60,22 @@ class DataWriter(object):
 			
 			
 	def WriteNewLine(self):
-		self.out.write("\n")
+		self.out.write(b"\n")
 		self.before = self.indent
 		
 		
 	def BeginChild(self):
-		self.indent += "\t"
+		self.indent += b"\t"
 		self.before = self.indent
 		
 		
 	def EndChild(self):
-		self.indent = self.indent.rpartition("\t")[0]
+		self.indent = self.indent.rpartition(b"\t")[0]
 		self.before = self.indent
 		
 		
 	def WriteComment(self, string):
-		self.out.write(self.indent + "# " + string + "\n")
+		self.out.write(self.indent + b"# " + string.encode() + b"\n")
 		
 		
 	def WriteToken(self, string):
@@ -91,11 +91,11 @@ class DataWriter(object):
 		
 		self.out.write(self.before)
 		if hasSpace and hasQuote:
-			self.out.write("`" + string + "`")
+			self.out.write(b"`" + string.encode() + b"`")
 		elif hasSpace:
-			self.out.write('"' + string + '"')
+			self.out.write(b'"' + string.encode() + b'"')
 		else:
-			self.out.write(string)
+			self.out.write(string.encode())
 		
 		self.before = self.space
 

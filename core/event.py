@@ -16,12 +16,12 @@
 
 
 
-from ESParserPy.dataNode import DataNode
+from .ESParserPy.dataNode import DataNode
 
 
 
 def Event(galaxySize):
-	print "Building event..."
+	print("Building event...")
 	root = DataNode()
 	event = DataNode(tokens=["event", "gauntlet clear"])
 	root.Append(event)

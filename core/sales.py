@@ -16,12 +16,12 @@
 
 
 
-from ESParserPy.dataNode import DataNode
+from .ESParserPy.dataNode import DataNode
 
 
 
 def Sales(ammoList):
-	print "Building sales..."
+	print("Building sales...")
 	root = DataNode()
 	outfitter = DataNode(tokens=["outfitter", "Gauntlet Ammo"])
 	root.Append(outfitter)

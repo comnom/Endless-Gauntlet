@@ -19,24 +19,28 @@
 from core.event import Event
 from core.map import Map
 from core.mission import Mission
+from core.params import Params
 from core.sales import Sales
 from core.ship import Ship
 
+from core.ESParserPy.dataFile import DataFile
 from core.ESParserPy.dataWriter import DataWriter
 from core.ESParserPy.getSources import GetSources
 
-from core import PARAMS
+import os
+import sys
 
 
-
-def Init(dataPath, pluginPath):
-	print "Init sources..."
+def Init(params):
+	print("Init sources...")
 	ships = {}
 	variants = []
 	ammo = []
-	files = GetSources(dataPath, pluginPath)
+	files = GetSources(params.gamePath, params.pluginPath)
 	for file in files[:]:
-		if not "EndlessGauntlet" in file.root.Token(1):
+		if not file:
+			continue
+		if not params.rootPath in file.root.Token(1):
 			for node in file.Begin():
 				key = node.Token(0)
 				size = node.Size()
@@ -67,63 +71,101 @@ def Init(dataPath, pluginPath):
 		
 	fighters = {}
 	drones = {}
-	for ship in ships.values():
+	for key in list(ships):
+		ship = ships[key]
 		name = (ship.variantName if ship.variantName else ship.modelName)
-		if not ship.category or name in PARAMS.EXCLUDE:
-			ships.pop(name)
+		if not ship.category or name in params.excludeShips:
+			ships.pop(key)
 		else:
 			ship.SetTier()
-			weight = PARAMS.WEIGHTS[ship.category]
-			tWeight = PARAMS.T_WEIGHTS[ship.tier]
+			weight = params.categoryWeights[ship.category]
+			tWeight = params.tierWeights[ship.tier]
 			if not weight or not tWeight:
-				ships.pop(name)
+				ships.pop(key)
+				continue
 			else:
 				ship.cost = weight + tWeight
 				
 			isFighter = (True if ship.category == "Fighter" else False)
 			isDrone = (True if ship.category == "Drone" else False)
 			if isFighter:
-				fighters[name] = ships.pop(name)
+				fighters[key] = ships.pop(key)
 			elif isDrone:
-				drones[name] = ships.pop(name)
+				drones[key] = ships.pop(key)
 		
 	return ships, fighters, drones, ammo
 	
 	
 if __name__ == "__main__":
-	dataPath = PARAMS.GAME_PATH
-	pluginPath = ""
-	if PARAMS.USE_PLUGINS:
-		pluginPath = PARAMS.PLUGIN_PATH
+	if sys.version_info[0] < 3:
+		print("This program requires version 3 of Python")
+		print("Visit: https://www.python.org/downloads/")
+		sys.exit("Aborting...")
 		
-	ships, fighters, drones, ammo = Init(dataPath, pluginPath)
+	thisDir = os.path.normpath(os.path.dirname(__file__))
+	paramDir = thisDir + os.path.normpath("/params.txt")
+	if not os.path.isfile(paramDir):
+		print("Cannot locate params.txt in " + paramDir)
+		input("Press enter to abort.")
+		sys.exit("Aborting...")
+		
+	paramsFile = DataFile(thisDir + "/params.txt")
+	params = Params(thisDir, paramsFile.root)
+	paramsFile.root.Delete()
+	
+	if not params.gamePath.endswith("data"):
+		if params.gamePath.endswith("/") or params.gamePath.endswith("\\"):
+			params.gamePath += "data"
+		else:
+			params.gamePath += os.path.normpath("/data")
+	if not params.gamePath or not os.path.isdir(params.gamePath):
+		print("Cannot locate game data files in " + params.gamePath)
+		input("Press enter to abort.")
+		sys.exit("Aborting...")
+		
+	if params.usePlugins:
+		if not params.pluginPath.endswith("plugins"):
+			if params.pluginPath.endswith("/") or params.pluginPath.endswith("\\"):
+				params.pluginPath += "plugins"
+			else:
+				params.pluginPath += os.path.normpath("/plugins")
+		if not params.pluginPath or not os.path.isdir(params.pluginPath):
+			print("Cannot find plugin directory in " + params.pluginPath)
+			userIn = input("Continue with only vanilla ships? y/n:")
+			no = ("n", "no", "No", "NO")
+			if userIn in no:
+				sys.exit("Aborting...")
+			else:
+				params.pluginPath = ""
+				print("Using only vanilla ships")
+			
+	ships, fighters, drones, ammo = Init(params)
 	allShips = (ships, fighters, drones)
-	missionRoot = Mission(allShips)
-	missionFile = DataWriter("data/mission.txt")
+	missionRoot = Mission(params, allShips)
+	missionFile = DataWriter(thisDir + "/data/mission.txt")
 	for node in missionRoot.Begin():
 		missionFile.Write(node)
 	
-	galaxySize = PARAMS.GALAXY_SIZE
-	checkpoints = [PARAMS.CHECKPOINTS, PARAMS.CHECKPOINT_MIN, PARAMS.CHECKPOINT_MAX]
-	mapRoot = Map(galaxySize, checkpoints, PARAMS.HEALTHPACK_FREQUENCY)
-	mapFile = DataWriter("data/map.txt")
+	mapRoot = Map(params)
+	mapFile = DataWriter(thisDir + "/data/map.txt")
 	for node in mapRoot.Begin():
 		mapFile.Write(node)
 		
 	salesRoot = Sales(ammo)
-	salesFile = DataWriter("data/sales.txt")
+	salesFile = DataWriter(thisDir + "/data/sales.txt")
 	for node in salesRoot.Begin():
 		salesFile.Write(node)
 		
-	eventRoot = Event(galaxySize)
-	eventFile = DataWriter("data/events.txt")
+	eventRoot = Event(params.galaxySize)
+	eventFile = DataWriter(thisDir + "/data/events.txt")
 	for node in eventRoot.Begin():
 		eventFile.Write(node)
 		
-	print "Saving..."
+	print("Saving...")
 	missionFile.Save()
 	mapFile.Save()
 	salesFile.Save()
 	eventFile.Save()
-	print "Done!"
-	done = raw_input("Press enter to close.")
+	print("Done!")
+	
+	input("Press enter to close.")

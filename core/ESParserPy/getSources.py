@@ -16,7 +16,7 @@
 
 
 
-from dataFile import DataFile
+from .dataFile import DataFile
 
 import os
 

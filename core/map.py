@@ -16,7 +16,7 @@
 
 
 
-from ESParserPy.dataNode import DataNode
+from .ESParserPy.dataNode import DataNode
 
 import math
 import random
@@ -27,12 +27,12 @@ asteroidNames = ['small metal', 'small rock', 'medium metal', 'medium rock',
 		
 stars = ['a0', 'a5', 'b5', 'f0', 'f5', 'g0', 'g5', 'k0', 'k5', 'm0', 'm4', 'm8']
 		
-def Map(galaxySize, checkpoints, hFrequency):
-	print "Building map..."
-	offsets = GetOffsets(galaxySize)
-	points = GetCheckpoints(galaxySize, checkpoints)
+def Map(params):
+	print("Building map...")
+	offsets = GetOffsets(params.galaxySize)
+	points = GetCheckpoints(params)
 	root = DataNode()
-	for i in range(galaxySize):
+	for i in range(params.galaxySize):
 		system = DataNode(tokens=["system", "VR System {}".format(i)])
 		
 		x = 20000 - offsets[i][0]
@@ -42,7 +42,7 @@ def Map(galaxySize, checkpoints, hFrequency):
 		
 		if i == 0:
 			system.Append(DataNode(tokens=["link", "VR System 1"]))
-		elif i == (galaxySize - 1):
+		elif i == (params.galaxySize - 1):
 			system.Append(DataNode(tokens=["link", "VR System {}".format(i - 1)]))
 		else:
 			system.Append(DataNode(tokens=["link", "VR System {}".format(i - 1)]))
@@ -56,7 +56,7 @@ def Map(galaxySize, checkpoints, hFrequency):
 				tokens.append("{:.4f}".format(random.uniform(1, 10)))
 				system.Append(DataNode(tokens=tokens))
 				
-		system.Append(DataNode(tokens=["fleet", "healthpacks", str(hFrequency)]))
+		system.Append(DataNode(tokens=["fleet", "healthpacks", str(params.frequency)]))
 		
 		star = "star/" + random.choice(stars)
 		object = DataNode(tokens=["object"])
@@ -110,11 +110,11 @@ def GetOffsets(galaxySize):
 	return offsets
 	
 	
-def GetCheckpoints(galaxySize, checkpoints):
-	maxRange = min(10, checkpoints[2])
-	minRange = min((maxRange - 1), max(1, checkpoints[1]))
-	total = min(checkpoints[0], (maxRange - minRange))
-	end = galaxySize - (galaxySize % 10)
+def GetCheckpoints(params):
+	maxRange = min(10, params.maxPoint)
+	minRange = min((maxRange - 1), max(1, params.minPoint))
+	total = min(params.checkpoints, (maxRange - minRange))
+	end = params.galaxySize - (params.galaxySize % 10)
 	points = []
 	if total:
 		for i in range(0, end, 10):

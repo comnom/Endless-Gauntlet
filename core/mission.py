@@ -16,17 +16,15 @@
 
 
 
-from ESParserPy.dataNode import DataNode
-
-import PARAMS
+from .ESParserPy.dataNode import DataNode
 
 import random
 import time
 
 
 
-def Mission(allShips):
-	print "Building mission..."
+def Mission(params, allShips):
+	print("Building mission...")
 	root = DataNode()
 	
 	uID = time.time()
@@ -60,7 +58,7 @@ def Mission(allShips):
 	choice.Append(decline)
 	decline.Append(DataNode(tokens=["defer"]))
 	
-	for i in range(PARAMS.GALAXY_SIZE):
+	for i in range(params.galaxySize):
 		npc = DataNode(tokens=["npc", "kill"])
 		mission.Append(npc)
 		
@@ -74,7 +72,7 @@ def Mission(allShips):
 		
 		variant = DataNode(tokens=["variant"])
 		fleet.Append(variant)
-		ships = GetFleet(allShips)
+		ships = GetFleet(params, allShips)
 		for ship in ships:
 			variant.Append(DataNode(tokens=[ship]))
 			
@@ -98,20 +96,19 @@ def Mission(allShips):
 	return root
 	
 	
-def GetFleet(allShips):
+def GetFleet(params, allShips):
 	ships = allShips[0]
 	fighters = allShips[1]
 	drones = allShips[2]
 	
 	minShip = GetMin(ships)
-	minFighter = GetMin(fighters)
-	minDrone = GetMin(drones)
 	
-	fleetSize = PARAMS.FLEET_SIZE
-	fleetSize += random.randint(-PARAMS.VARIANCE, PARAMS.VARIANCE)
+	fleetSize = params.fleetSize
+	fleetSize += random.randint(-params.sizeVariance, params.sizeVariance)
+	
 	fleet = []
 	while round(fleetSize, 1) > round(minShip, 1):
-		ship = GetShip(ships, fleetSize)
+		ship = GetShip(params, ships, fleetSize)
 		if ship == None:
 			break
 			
@@ -121,7 +118,7 @@ def GetFleet(allShips):
 		
 		fCount = ship.fighters
 		while fCount:
-			fighter = GetCarried(fighters, ship.tier)
+			fighter = GetCarried(params, fighters, ship.tier)
 			if fighter == None:
 				break
 				
@@ -131,7 +128,7 @@ def GetFleet(allShips):
 			
 		dCount = ship.drones
 		while dCount:
-			drone = GetCarried(drones, ship.tier)
+			drone = GetCarried(params, drones, ship.tier)
 			if drone == None:
 				break
 				
@@ -142,7 +139,7 @@ def GetFleet(allShips):
 	return fleet
 	
 	
-def GetShip(ships, fleetSize):
+def GetShip(params, ships, fleetSize):
 	validShips = []
 	validWeights = []
 	for ship in ships.values():
@@ -152,10 +149,10 @@ def GetShip(ships, fleetSize):
 			if combo not in validWeights:
 				validWeights.append(combo)
 				
-	return Selection(validShips, validWeights)
+	return Selection(params, validShips, validWeights)
 	
 	
-def GetCarried(ships, tier):
+def GetCarried(params, ships, tier):
 	validShips = []
 	validWeights = []
 	for ship in ships.values():
@@ -165,13 +162,13 @@ def GetCarried(ships, tier):
 			if combo not in validWeights:
 				validWeights.append(combo)
 				
-	return Selection(validShips, validWeights)
+	return Selection(params, validShips, validWeights)
 	
 	
-def Selection(ships, weights):
+def Selection(params, ships, weights):
 	weightedList = []
 	for combo in weights:
-		sum = int(PARAMS.T_WEIGHTS[combo[0]] + PARAMS.WEIGHTS[combo[1]])
+		sum = int(params.tierWeights[combo[0]] + params.categoryWeights[combo[1]])
 		for i in range(sum):
 			weightedList.append(combo)
 			
@@ -184,7 +181,6 @@ def Selection(ships, weights):
 			return ship
 			
 	return None
-	
 	
 def GetMin(ships):
 	cost = 0

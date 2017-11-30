@@ -23,7 +23,7 @@
 
 
 
-from dataNode import DataNode
+from .dataNode import DataNode
 
 import os
 import io
@@ -59,7 +59,7 @@ class DataFile(object):
 			
 			with io.open(path, "rb") as newFile:
 				for line in newFile:
-					result.append(line)
+					result.append(line.decode("utf-8"))
 		
 		except (IOError, OSError) as error:
 			message = error.strerror + " " + error.filename
