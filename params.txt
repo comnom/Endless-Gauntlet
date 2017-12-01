@@ -25,7 +25,7 @@
 # "plugin path" The path to the plugin directory. Use forward slashes: /
 
 paths
-	"game path" ""
+	"game path" "C:/Program Files (x86)/Steam/steamapps/common/Endless Sky/data"
 	"use plugins" 0
 		"plugin path" ""
 		
@@ -42,7 +42,7 @@ galaxy
 	checkpoints 1
 	min 3
 	max 6
-	"healthpack frequency" 4000
+	"healthpack frequency" 8000
 	
 
 # "size":	
@@ -81,7 +81,8 @@ weights
 		
 		
 # Ships that won't be used to build the fleets.
-# Ships with no category or a zero weight are excluded by default.	
+# Ships with no category or a zero weight are excluded by default.
+
 ships
 	exclude
 		Boxwing
@@ -94,3 +95,8 @@ ships
 		"Surveillance Drone"
 		"Void Sprite"
 		"Void Sprite (Infant)"
+
+# The "seed" for the random number generator. This is the number in () next
+# to the mission name in mission.txt. If empty, the seed will be random.
+		
+seed ""

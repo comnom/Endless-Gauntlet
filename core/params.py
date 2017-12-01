@@ -21,8 +21,9 @@ import os
 
 
 class Params(object):
-	def __init__(self, rootPath, dataNode):
+	def __init__(self, rootPath, uID, dataNode):
 		self.rootPath = rootPath
+		self.uID = uID
 		self.gamePath = ""
 		
 		self.usePlugins = False
@@ -98,6 +99,9 @@ class Params(object):
 					if child.Token(0) == "exclude":
 						for grand in child.Begin():
 							self.excludeShips.append(grand.Token(0))
+			elif key == "seed":
+				if node.Size() >= 2:
+					self.uID = node.Value(1)
 			else:
 				print("Unrecognized token " + key + " in params.txt")
 				

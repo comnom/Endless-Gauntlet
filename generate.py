@@ -28,7 +28,9 @@ from core.ESParserPy.dataWriter import DataWriter
 from core.ESParserPy.getSources import GetSources
 
 import os
+import random
 import sys
+import uuid
 
 
 def Init(params):
@@ -109,9 +111,11 @@ if __name__ == "__main__":
 		input("Press enter to abort.")
 		sys.exit("Aborting...")
 		
+	uID = uuid.uuid4().int
 	paramsFile = DataFile(thisDir + "/params.txt")
-	params = Params(thisDir, paramsFile.root)
+	params = Params(thisDir, uID, paramsFile.root)
 	paramsFile.root.Delete()
+	random.seed(params.uID)
 	
 	if not params.gamePath.endswith("data"):
 		if params.gamePath.endswith("/") or params.gamePath.endswith("\\"):
@@ -169,3 +173,4 @@ if __name__ == "__main__":
 	print("Done!")
 	
 	input("Press enter to close.")
+	

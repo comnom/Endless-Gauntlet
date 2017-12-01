@@ -19,7 +19,6 @@
 from .ESParserPy.dataNode import DataNode
 
 import random
-import time
 
 
 
@@ -27,7 +26,7 @@ def Mission(params, allShips):
 	print("Building mission...")
 	root = DataNode()
 	
-	uID = time.time()
+	uID = params.uID
 	mission = DataNode(tokens=["mission", "Gauntlet ({})".format(uID)])
 	root.Append(mission)
 	
