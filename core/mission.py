@@ -26,8 +26,7 @@ def Mission(params, allShips):
 	print("Building mission...")
 	root = DataNode()
 	
-	uID = params.uID
-	mission = DataNode(tokens=["mission", "Gauntlet ({})".format(uID)])
+	mission = DataNode(tokens=["mission", "Gauntlet ({})".format(params.uID)])
 	root.Append(mission)
 	
 	mission.Append(DataNode(tokens=["name", "Attempt the Gauntlet!"]))
@@ -147,7 +146,7 @@ def GetShip(params, ships, fleetSize):
 			combo = [ship.tier, ship.category]
 			if combo not in validWeights:
 				validWeights.append(combo)
-				
+	
 	return Selection(params, validShips, validWeights)
 	
 	
@@ -173,7 +172,7 @@ def Selection(params, ships, weights):
 			
 	selection = random.choice(weightedList)
 	doSelection = 1000
-	while doSelection > 0:
+	while doSelection:
 		doSelection -= 1
 		ship = random.choice(ships)
 		if ship.tier == selection[0] and ship.category == selection[1]:

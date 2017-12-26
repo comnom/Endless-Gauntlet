@@ -119,8 +119,7 @@ def GetCheckpoints(params):
 	if total:
 		for i in range(0, end, 10):
 			valid = range(minRange + i, maxRange + i)
-			choice = random.sample(valid, total)
-			points += choice
+			points += random.sample(valid, total)
 			
 	return sorted(points)
 	

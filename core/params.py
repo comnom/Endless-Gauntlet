@@ -100,7 +100,7 @@ class Params(object):
 						for grand in child.Begin():
 							self.excludeShips.append(grand.Token(0))
 			elif key == "seed":
-				if node.Size() >= 2:
+				if node.Size() >= 2 and node.Token(1):
 					self.uID = node.Value(1)
 			else:
 				print("Unrecognized token " + key + " in params.txt")

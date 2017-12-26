@@ -39,20 +39,20 @@ def Init(params):
 	variants = []
 	ammo = []
 	files = GetSources(params.gamePath, params.pluginPath)
-	for file in files[:]:
+	for file in files:
 		if not file:
 			continue
 		if not params.rootPath in file.root.Token(1):
 			for node in file.Begin():
 				key = node.Token(0)
 				size = node.Size()
-				if key == "ship":
+				if key == "ship" and size >= 2:
 					ship = Ship(node)
 					if ship.variantName:
 						variants.append(ship)
 					else:
 						ships[ship.modelName] = ship
-				elif key == "outfit":
+				elif key == "outfit" and size >= 2:
 					isAmmo = False
 					hasAmmo = False
 					for child in node.BeginFlat():
@@ -65,7 +65,6 @@ def Init(params):
 							hasAmmo = True
 					if isAmmo and not hasAmmo:
 						ammo.append(node.Token(1))
-		file.root.Delete()
 			
 	for variant in variants:
 		variant.GetBase(ships[variant.modelName])
@@ -102,9 +101,10 @@ if __name__ == "__main__":
 	if sys.version_info[0] < 3:
 		print("This program requires version 3 of Python")
 		print("Visit: https://www.python.org/downloads/")
+		input("Press enter to abort.")
 		sys.exit("Aborting...")
 		
-	thisDir = os.path.normpath(os.path.dirname(__file__))
+	thisDir = os.getcwd()
 	paramDir = thisDir + os.path.normpath("/params.txt")
 	if not os.path.isfile(paramDir):
 		print("Cannot locate params.txt in " + paramDir)
@@ -135,7 +135,7 @@ if __name__ == "__main__":
 				params.pluginPath += os.path.normpath("/plugins")
 		if not params.pluginPath or not os.path.isdir(params.pluginPath):
 			print("Cannot find plugin directory in " + params.pluginPath)
-			userIn = input("Continue with only vanilla ships? y/n:")
+			userIn = input("Continue with only vanilla ships? y/n: ")
 			no = ("n", "no", "No", "NO")
 			if userIn in no:
 				sys.exit("Aborting...")
@@ -149,21 +149,25 @@ if __name__ == "__main__":
 	missionFile = DataWriter(thisDir + "/data/mission.txt")
 	for node in missionRoot.Begin():
 		missionFile.Write(node)
+		missionFile.WriteNewLine()
 	
 	mapRoot = Map(params)
 	mapFile = DataWriter(thisDir + "/data/map.txt")
 	for node in mapRoot.Begin():
 		mapFile.Write(node)
+		mapFile.WriteNewLine()
 		
 	salesRoot = Sales(ammo)
 	salesFile = DataWriter(thisDir + "/data/sales.txt")
 	for node in salesRoot.Begin():
 		salesFile.Write(node)
+		salesFile.WriteNewLine()
 		
 	eventRoot = Event(params.galaxySize)
 	eventFile = DataWriter(thisDir + "/data/events.txt")
 	for node in eventRoot.Begin():
 		eventFile.Write(node)
+		eventFile.WriteNewLine()
 		
 	print("Saving...")
 	missionFile.Save()
@@ -173,4 +177,4 @@ if __name__ == "__main__":
 	print("Done!")
 	
 	input("Press enter to close.")
-	
+
