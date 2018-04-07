@@ -20,14 +20,20 @@
 
 
 
-# "game path" The path to the Endless Sky directory. Use forward slashes: /
+# "game path" The path to the Endless Sky/data directory. Use forward slashes: /
+
 # "use plugins" Set to 1 if plugin ships should be used to build the gauntlet.
 # "plugin path" The path to the plugin directory. Use forward slashes: /
 
+# "make backup" Set to 1 if a backup of the saves directory should be made.
+# "saves path" The path to the saves directory. Use forward slashes: /
+
 paths
-	"game path" "C:/Program Files (x86)/Steam/steamapps/common/Endless Sky/data"
+	"game path" ""
 	"use plugins" 0
 		"plugin path" ""
+	"make backup" 0
+		"saves path" ""
 		
 		
 # "size" The number of systems in the gauntlet.	

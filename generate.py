@@ -16,12 +16,13 @@
 
 
 
+from core.backup import Backup
 from core.event import Event
+from core.gameData import GameData
 from core.map import Map
 from core.mission import Mission
 from core.params import Params
 from core.sales import Sales
-from core.ship import Ship
 
 from core.ESParserPy.dataFile import DataFile
 from core.ESParserPy.dataWriter import DataWriter
@@ -33,107 +34,38 @@ import sys
 import uuid
 
 
-def Init(params):
-	print("Init sources...")
-	ships = {}
-	variants = []
-	ammo = []
-	files = GetSources(params.gamePath, params.pluginPath)
-	for file in files:
-		if not file:
-			continue
-		if not params.rootPath in file.root.Token(1):
-			for node in file.Begin():
-				key = node.Token(0)
-				size = node.Size()
-				if key == "ship" and size >= 2:
-					ship = Ship(node)
-					if ship.variantName:
-						variants.append(ship)
-					else:
-						ships[ship.modelName] = ship
-				elif key == "outfit" and size >= 2:
-					isAmmo = False
-					hasAmmo = False
-					for child in node.BeginFlat():
-						childKey = child.Token(0)
-						childSize = child.Size()
-						if childKey == "category" and childSize >= 2:
-							if child.Token(1) == "Ammunition":
-								isAmmo = True
-						elif childKey == "ammo":
-							hasAmmo = True
-					if isAmmo and not hasAmmo:
-						ammo.append(node.Token(1))
-			
-	for variant in variants:
-		variant.GetBase(ships[variant.modelName])
-		ships[variant.variantName] = variant
-		
-	fighters = {}
-	drones = {}
-	for key in list(ships):
-		ship = ships[key]
-		name = (ship.variantName if ship.variantName else ship.modelName)
-		if not ship.category or name in params.excludeShips:
-			ships.pop(key)
-		else:
-			ship.SetTier()
-			weight = params.categoryWeights[ship.category]
-			tWeight = params.tierWeights[ship.tier]
-			if not weight or not tWeight:
-				ships.pop(key)
-				continue
-			else:
-				ship.cost = weight + tWeight
-				
-			isFighter = (True if ship.category == "Fighter" else False)
-			isDrone = (True if ship.category == "Drone" else False)
-			if isFighter:
-				fighters[key] = ships.pop(key)
-			elif isDrone:
-				drones[key] = ships.pop(key)
-		
-	return ships, fighters, drones, ammo
+
+def OnFail(message):
+	print(message)
+	input("Press enter to abort.")
+	sys.exit("Aborting...")
 	
 	
 if __name__ == "__main__":
 	if sys.version_info[0] < 3:
-		print("This program requires version 3 of Python")
-		print("Visit: https://www.python.org/downloads/")
-		input("Press enter to abort.")
-		sys.exit("Aborting...")
+		message = ("This program requires version 3 of Python." +
+			"\nVisit: https://www.python.org/downloads/")
+		OnFail(message)
 		
-	thisDir = os.getcwd()
-	paramDir = thisDir + os.path.normpath("/params.txt")
+	thisDir = os.path.dirname(os.path.abspath(__file__))
+	paramDir = os.path.join(thisDir, "params.txt")
 	if not os.path.isfile(paramDir):
-		print("Cannot locate params.txt in " + paramDir)
-		input("Press enter to abort.")
-		sys.exit("Aborting...")
+		OnFail("Cannot locate params.txt in " + paramDir)
 		
 	uID = uuid.uuid4().int
-	paramsFile = DataFile(thisDir + "/params.txt")
+	paramsFile = DataFile(paramDir)
 	params = Params(thisDir, uID, paramsFile.root)
-	paramsFile.root.Delete()
 	random.seed(params.uID)
 	
 	if not params.gamePath.endswith("data"):
-		if params.gamePath.endswith("/") or params.gamePath.endswith("\\"):
-			params.gamePath += "data"
-		else:
-			params.gamePath += os.path.normpath("/data")
-	if not params.gamePath or not os.path.isdir(params.gamePath):
-		print("Cannot locate game data files in " + params.gamePath)
-		input("Press enter to abort.")
-		sys.exit("Aborting...")
+		params.gamePath = os.path.join(params.gamePath, "data")
+	if not os.path.isdir(params.gamePath):
+		OnFail("Cannot locate game data files in " + params.gamePath)
 		
 	if params.usePlugins:
 		if not params.pluginPath.endswith("plugins"):
-			if params.pluginPath.endswith("/") or params.pluginPath.endswith("\\"):
-				params.pluginPath += "plugins"
-			else:
-				params.pluginPath += os.path.normpath("/plugins")
-		if not params.pluginPath or not os.path.isdir(params.pluginPath):
+			params.pluginPath = os.path.join(params.pluginPath, "plugins")
+		if not os.path.isdir(params.pluginPath):
 			print("Cannot find plugin directory in " + params.pluginPath)
 			userIn = input("Continue with only vanilla ships? y/n: ")
 			no = ("n", "no", "No", "NO")
@@ -141,40 +73,32 @@ if __name__ == "__main__":
 				sys.exit("Aborting...")
 			else:
 				params.pluginPath = ""
-				print("Using only vanilla ships")
-			
-	ships, fighters, drones, ammo = Init(params)
-	allShips = (ships, fighters, drones)
-	missionRoot = Mission(params, allShips)
-	missionFile = DataWriter(thisDir + "/data/mission.txt")
-	for node in missionRoot.Begin():
-		missionFile.Write(node)
-		missionFile.WriteNewLine()
+				print("Using only vanilla ships.")
+	else:
+		params.pluginPath = ""
 	
-	mapRoot = Map(params)
-	mapFile = DataWriter(thisDir + "/data/map.txt")
-	for node in mapRoot.Begin():
-		mapFile.Write(node)
-		mapFile.WriteNewLine()
-		
-	salesRoot = Sales(ammo)
-	salesFile = DataWriter(thisDir + "/data/sales.txt")
-	for node in salesRoot.Begin():
-		salesFile.Write(node)
-		salesFile.WriteNewLine()
-		
-	eventRoot = Event(params.galaxySize)
-	eventFile = DataWriter(thisDir + "/data/events.txt")
-	for node in eventRoot.Begin():
-		eventFile.Write(node)
-		eventFile.WriteNewLine()
-		
-	print("Saving...")
-	missionFile.Save()
-	mapFile.Save()
-	salesFile.Save()
-	eventFile.Save()
+	if params.doBackup:
+		Backup(params)
+	
+	print("Initializing sources...")
+	files = GetSources(params.gamePath, params.pluginPath)
+	gameData = GameData(params, files)
+	
+	outFiles = []
+	dataDir = os.path.join(thisDir, "data")
+	outFiles.append([Mission(params, gameData), DataWriter(dataDir + "/mission.txt")])
+	outFiles.append([Map(params), DataWriter(dataDir + "/map.txt")])
+	outFiles.append([Sales(gameData.ammo), DataWriter(dataDir + "/sales.txt")])
+	outFiles.append([Event(params.galaxySize), DataWriter(dataDir + "/events.txt")])
+
+	print("Writing files...")
+	for newFile in outFiles:
+		for node in newFile[0].Begin():
+			newFile[1].Write(node)
+			newFile[1].WriteNewLine()
+		newFile[1].Save()
 	print("Done!")
 	
 	input("Press enter to close.")
-
+	
+	

@@ -16,6 +16,8 @@
 
 
 
+from .ESParserPy.getSources import GetConfigPath, GetGamePath
+
 import os
 
 
@@ -24,10 +26,15 @@ class Params(object):
 	def __init__(self, rootPath, uID, dataNode):
 		self.rootPath = rootPath
 		self.uID = uID
-		self.gamePath = ""
+		defaultGamePath = GetGamePath()
+		self.gamePath = defaultGamePath
 		
+		
+		defaultPath = GetConfigPath()
 		self.usePlugins = False
-		self.pluginPath = ""
+		self.pluginPath = (os.path.join(defaultPath, "plugins") if defaultPath else "")
+		self.doBackup = False
+		self.savesPath = (os.path.join(defaultPath, "saves") if defaultPath else "")
 		
 		self.galaxySize = 0
 		self.checkpoints = 0
@@ -54,14 +61,23 @@ class Params(object):
 				for child in node.Begin():
 					childKey = child.Token(0)
 					childSize = child.Size()
-					if childKey == "game path" and childSize >= 2:
-						self.gamePath = os.path.normpath(child.Token(1))
+					if childKey == "game path":
+						if childSize >= 2 and child.Token(1):
+							self.gamePath = os.path.normpath(child.Token(1))
 					elif childKey == "use plugins" and childSize >= 2:
 						self.usePlugins = (True if child.Value(1) else False)
 						if self.usePlugins:
 							for grand in child.Begin():
-								if grand.Token(0) == "plugin path" and grand.Size() >= 2:
-									self.pluginPath = grand.Token(1)
+								if grand.Token(0) == "plugin path":
+									if grand.Size() >= 2 and grand.Token(1):
+										self.pluginPath = os.path.normpath(grand.Token(1))
+					elif childKey == "make backup" and childSize >= 2:
+						self.doBackup = (True if child.Value(1) else False)
+						if self.doBackup:
+							for grand in child.Begin():
+								if grand.Token(0) == "saves path":
+									if grand.Size() >= 2 and grand.Token(1):
+										self.savesPath = os.path.normpath(grand.Token(1))
 			elif key == "galaxy":
 				for child in node.Begin():
 					childKey = child.Token(0)
@@ -103,5 +119,5 @@ class Params(object):
 				if node.Size() >= 2 and node.Token(1):
 					self.uID = node.Value(1)
 			else:
-				print("Unrecognized token " + key + " in params.txt")
+				node.PrintTrace("Skipping unrecognized parameter: ")
 				

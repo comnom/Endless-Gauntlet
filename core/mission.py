@@ -22,7 +22,7 @@ import random
 
 
 
-def Mission(params, allShips):
+def Mission(params, gameData):
 	print("Building mission...")
 	root = DataNode()
 	
@@ -48,7 +48,7 @@ def Mission(params, allShips):
 	choice = DataNode(tokens=["choice"])
 	conversation.Append(choice)
 	
-	confirm = DataNode(tokens=['	"I will"'])
+	confirm = DataNode(tokens=['	"I will."'])
 	choice.Append(confirm)
 	confirm.Append(DataNode(tokens=["accept"]))
 	
@@ -70,7 +70,7 @@ def Mission(params, allShips):
 		
 		variant = DataNode(tokens=["variant"])
 		fleet.Append(variant)
-		ships = GetFleet(params, allShips)
+		ships = GetFleet(params, gameData)
 		for ship in ships:
 			variant.Append(DataNode(tokens=[ship]))
 			
@@ -94,19 +94,15 @@ def Mission(params, allShips):
 	return root
 	
 	
-def GetFleet(params, allShips):
-	ships = allShips[0]
-	fighters = allShips[1]
-	drones = allShips[2]
-	
-	minShip = GetMin(ships)
+def GetFleet(params, gameData):
+	minShip = GetMin(gameData.ships)
 	
 	fleetSize = params.fleetSize
 	fleetSize += random.randint(-params.sizeVariance, params.sizeVariance)
 	
 	fleet = []
 	while round(fleetSize, 1) > round(minShip, 1):
-		ship = GetShip(params, ships, fleetSize)
+		ship = GetShip(params, gameData.ships, fleetSize)
 		if ship == None:
 			break
 			
@@ -116,7 +112,7 @@ def GetFleet(params, allShips):
 		
 		fCount = ship.fighters
 		while fCount:
-			fighter = GetCarried(params, fighters, ship.tier)
+			fighter = GetCarried(params, gameData.fighters, ship.tier)
 			if fighter == None:
 				break
 				
@@ -126,7 +122,7 @@ def GetFleet(params, allShips):
 			
 		dCount = ship.drones
 		while dCount:
-			drone = GetCarried(params, drones, ship.tier)
+			drone = GetCarried(params, gameData.drones, ship.tier)
 			if drone == None:
 				break
 				
