@@ -1,3 +1,5 @@
+Update 10/20/2018: Development on this project has been suspended indefinitely.
+
 # Endless Gauntlet
 
 A plugin for the free and open-source 2D space trading and combat game [Endless Sky](https://endless-sky.github.io/).
